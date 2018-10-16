@@ -37,7 +37,8 @@ print(data.shape)
 #specify columns to be seperate inputs
 n_in = data.shape[1]
 #make the weights
-w = np.random.randn(3, n_in) * 0.1
+number_nodes = 3
+w = np.random.randn(number_nodes, n_in) * 0.1
 #hyperparameters
 lr = 0.025
 n_iters = 500
@@ -57,6 +58,44 @@ for i in range(n_iters):
 ###############################################################################
 
 #validation query
+#nodes = []
+#for i in range(0, number_nodes):
+#    nodename = 'node'
+#    number = i
+#    nodename = nodename + str(number)
+#    nodes.append(nodename)
+#print(nodes)
+
+#nnodes = []
+#for nodename in nodes:
+#    node = w[number, :]
+#    nodename = node
+#    nnodes.append(nodename)
+#print(nnodes)
+
+#differences = []
+#for nodename in nnodes:
+#    difference = 'diff' + str(number)
+#    differences.append(difference)
+#def difference (nodes):
+#    for difference in differences:
+#        diff = nodename - data
+#print(differences)
+#difference(diff2)
+
+#ef nodetype (nodes):
+ #   for nodename in nnodes[:, 1]:
+  #      if nodename < 0.5:
+   #         nodetype = 'downregulated'
+    #    if nodename > 0.5:
+     #       nodetype = 'upregulated'
+      #  else:
+       #     node = 'neutral'             
+#nodetype(node0)   
+    
+    
+    
+    
 node1 = w[0, :]
 node2 = w[1, :]
 node3 = w[2, :]
@@ -76,50 +115,17 @@ dist3array.shape = (7905, 1)
 top1 = np.argmin(dist1)
 top2 = np.argmin(dist2)
 top3 = np.argmin(dist3)
-print(dist1[top1])
-#add gene names to dist
-dataname = []
-for name in namedata:
-    input = name
-    input = input.lower()
-    numbername = []
-    for character in input:
-        number = ord(character) 
-        numbername.append(number)
-    dataname.append(numbername)
-len(dataname)#shape grew by one????? (7905 to 7906)????????????
-finalnames = []
-for element in dataname:
-    numbername = int("".join(map(str, element)))
-    type(numbername)
-    finalnames.append(numbername)
-len(finalnames)   
-namesarray = np.asarray(finalnames)
-namesarray.shape = (7905, 1)
-print(namesarray.shape)
-d1d = []
-d1d = np.concatenate((namesarray, dist1), axis=1)
-print(d1d.shape)
-print(d1d[top1])
-
-##convert queried gene-number-name back into gene-letter-name
-#lettername = []
-#for finalnames in data[:, 0]:
-#    letters = chr(finalnames)
-#    lettername.append(letters)
-#print(lettername.shape)
-#print(lettername)
-
-
+ans1 = namedata[top1]
+ans2 = namedata[top2]
+ans3 = namedata[top3]
 ans = []
-#ans = np.concatenate((namedata, dist2), axis=1)
-#ans = np.append(namedata, dist2, axis=1)
-#print(ans.shape)
+ans.append(ans1)
+ans.append(ans2)
+ans.append(ans3)
 
 
 
-
-
+ 
 ###plot the data in 3d topology graph
 #import matplotlib.pyplot as plt
 #from mpl_toolkits.mplot3d import Axes3D
@@ -127,20 +133,12 @@ ans = []
 #ax = fig.add_subplot(111, projection='3d')
 #Axes3D.plot_surface(X, Y, Z)
 
-###convert queried gene-number-name back into gene-letter-name
-#data *= np.std(data, 0)
-#data += np.mean(data, 0)
-#lettername = []
-#for finalnames in data[:, 0]:
-#    letters = chr(finalnames)
-#    lettername.append(letters)
-#print(lettername.shape)
-#print(lettername)
 
 ###############################################################################
 #show the weights for the datafile
 print (filename)
 print (w)
+print(ans)
 
   
 
