@@ -94,10 +94,10 @@ def trial(n_trial):
     print(w)
     print(node1, node2, node3)
     print(down, up, neut)
-n_trial = 1000
+n_trial = 3
 trial(n_trial)
 csvfile = 'genes' + str(n_trial) + filename
-csvname = 'genes' + str(n_trial) + filename
+csvname = 'genes' + str(n_trial) + file
 with open(csvfile, mode='w', newline='') as csvname:
     gene_writer = csv.writer(csvname, delimiter=',')
     gene_writer.writerow(down)
@@ -137,8 +137,8 @@ for item in down[:, 0]:
         both.insert(0, item)
 print(both)
 
-csvfile1 = filename + 'geneanalysis.csv'
-csvname1 = filename + 'geneanalysis'
+csvfile1 = file + 'geneanalysis.csv'
+csvname1 = file + 'geneanalysis'
 with open(csvfile1, mode='w', newline='') as csvname1:
     gene_writer = csv.writer(csvname1, delimiter=',')
     gene_writer.writerow(down)
