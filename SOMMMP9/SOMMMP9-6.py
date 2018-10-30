@@ -72,9 +72,6 @@ data = np.concatenate((data, condition), axis=1)
 print(data[0])
 print(data.shape)
 ###############################################################################
-down1 = []
-up1 = []
-neut1 = []
 file1 = 'DE1'
 filename1 = file1 + '.csv'
 data1 = np.genfromtxt(filename1, delimiter=',', missing_values='NA', filling_values=1, skip_header=2, usecols=range(1,7))
@@ -126,9 +123,6 @@ data1 = np.concatenate((data1, condition1), axis=1)
 print(data1[0])
 print(data1.shape)
 ###############################################################################
-down2 = []
-up2 = []
-neut2 = []
 file2 = 'DE2'
 filename2 = file2 + '.csv'
 data2 = np.genfromtxt(filename2, delimiter=',', missing_values='NA', filling_values=1, skip_header=2, usecols=range(1,7))
@@ -180,9 +174,6 @@ data2 = np.concatenate((data2, condition2), axis=1)
 print(data2[0])
 print(data2.shape)
 ###############################################################################
-down3 = []
-up3 = []
-neut3 = []
 file3 = 'DE3'
 filename3 = file3 + '.csv'
 data3 = np.genfromtxt(filename3, delimiter=',', missing_values='NA', filling_values=1, skip_header=2, usecols=range(1,7))
@@ -235,14 +226,30 @@ print(data3[0])
 print(data3.shape)
 ###############################################################################
 #put all the data in one array
-np.stack((data, data1))
+data = np.vstack((data, data1))
+print(data.shape)
+data = np.vstack((data, data2))
+print(data.shape)
+data = np.vstack((data, data3))
 print(data[0])
+print(data.shape)
 ###############################################################################
-
+data = np.array(data, dtype=np.float64)
+data -= np.mean(data, 0)
+data /= np.std(data, 0)
+print(data.shape)
+#specify columns to be seperate inputs
+n_in = data.shape[1]
+#make the weights
+number_nodes = 3
+w = np.random.randn(number_nodes, n_in) * 0.1
+#hyperparameters
+lr = 0.025
+n_iters = 1000
 #do the training and show the weights on the nodes with cv2
 def trial(n_trial):
     for instance in range(n_trial): 
-        #specigy the columns to later be represented by nodes
+        #specify the columns to later be represented by nodes
         n_in = data.shape[1]
         #make the weights
         number_nodes = 3
@@ -292,7 +299,7 @@ def trial(n_trial):
     print (filename)
     print(node1, node2, node3)
     print(down[0], up[0], neut[0])
-n_trial = 1000
+n_trial = 3
 trial(n_trial)
 csvfile = 'genes' + str(n_trial) + filename
 csvname = 'genes' + str(n_trial) + file
