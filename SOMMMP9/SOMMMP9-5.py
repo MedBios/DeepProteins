@@ -19,6 +19,7 @@ lr = 0.025
 n_iters = 100
 number_nodes = 3
 #get the data for all sheets independently
+D = []
 ws = []
 file = ['DE0', 'DE1', 'DE2', 'DE3']
 for DE in file:
@@ -36,7 +37,7 @@ for DE in file:
     d = np.array(d, dtype=np.float64)
     d -= np.mean(d, 0)
     d /= np.std(d, 0)
-    print(d.shape)
+    D.append(d)
 #make the weights
     n_in = d.shape[1]
     w = np.random.randn(number_nodes, n_in) * 0.1
@@ -56,16 +57,27 @@ for DE in file:
 #save weights
     ws.append(w)
 print(ws)
+#seperate the data per file
+d0 = D[0]
+d1 = D[1]
+d2 = D[2]
+d3 = D[3]
+print(D[0])
 #seperate weights per file
 w0 = ws[0]
 w1 = ws[1]
 w2 = ws[2]
 w3 = ws[3]
-
 #query validation  
-down = []
-up = []
-neut = []
+downhigh = []
+downlow = []
+uphigh = []
+uplow = []
+neuthigh = []
+neutlow = []
+N1 = []
+N2 = []
+N3 = []
 for w in ws:
     logcol = w[:, 1]
     downcol = np.argmin(logcol)
@@ -73,27 +85,38 @@ for w in ws:
     node1 = w[downcol, :]
     node2 = w[upcol, :]
     node3 = np.delete(w, [downcol, upcol], axis=0)               
+    N1.append(node1)
+    N2.append(node2)
+    N3.append(node3)
     print(node1)
+print(N1)
+
     
 #get the best fit and save it in down/up/neut
-for 
-    difference1 = node1 - d
-    dist1 = np.sum(np.abs(difference1), 1)
+for d in D:
+    difference1 = N1[0] - d
+    dist1 = np.sum(np.abs(difference1), 1)        
     top1 = np.argmin(dist1)
-    ans1 = nd[top1]
-    print(ans1)
-    down.insert(0, ans1) 
-    difference2 = node2 - d
+    bot1 = np.argmax(dist1)
+    low1 = nd[bot1]
+    high1 = nd[top1]
+    downhigh.insert(0, high1) 
+    np.insert(downlow, 0, low1, axis=0)
+    print(downlow)
+    
+    difference2 = N2[i] - d
     dist2 = np.sum(np.abs(difference2), 1)
     top2 = np.argmin(dist2)
+    low2 = np.argmax(dist2)
     ans2 = nd[top2]
     up.insert(0, ans2)
-    difference3 = node3 - d
+    difference3 = N3[i] - d
     dist3 = np.sum(np.abs(difference3), 1)
     top3 = np.argmin(dist3)
+    low3 = np.argmax(dist3)
     ans3 = nd[top3]
     neut.insert(0, ans3)
-
+    
 #validation query
 def nodes():
     nodes = []
