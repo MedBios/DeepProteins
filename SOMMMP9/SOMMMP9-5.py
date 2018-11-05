@@ -20,7 +20,7 @@ n_iters = 100
 number_nodes = 3
 #get the data for all sheets independently
 D = []
-ws = []
+ws = []#weights per sheet
 file = ['DE0', 'DE1', 'DE2', 'DE3']
 for DE in file:
     filename = DE + '.csv'
@@ -89,173 +89,39 @@ for w in ws:
     N2.append(node2)
     N3.append(node3)
     print(node1)
-print(N1)
-
-    
+print(N1)#down node for each sheet  
 #get the best fit and save it in down/up/neut
-for d in D:
-    difference1 = N1[0] - d
-    dist1 = np.sum(np.abs(difference1), 1)        
-    top1 = np.argmin(dist1)
-    bot1 = np.argmax(dist1)
-    low1 = nd[bot1]
-    high1 = nd[top1]
-    downhigh.insert(0, high1) 
-    np.insert(downlow, 0, low1, axis=0)
-    print(downlow)
-    
-    difference2 = N2[i] - d
-    dist2 = np.sum(np.abs(difference2), 1)
-    top2 = np.argmin(dist2)
-    low2 = np.argmax(dist2)
-    ans2 = nd[top2]
-    up.insert(0, ans2)
-    difference3 = N3[i] - d
-    dist3 = np.sum(np.abs(difference3), 1)
-    top3 = np.argmin(dist3)
-    low3 = np.argmax(dist3)
-    ans3 = nd[top3]
-    neut.insert(0, ans3)
-    
-#validation query
-def nodes():
-    nodes = []
-    for i in range(0, number_nodes):
-        nodename = 'node'
-        number = i
-        nodename = nodename + str(number)
-        nodes.append(nodename)
-    nodes = np.asarray(nodes)
-    nodes.shape = (number_nodes, 1)
-    nnodes = []
-    for node in nodes[:, 2]:
-        if node < 0.5:
-            nodetype = 'downregulated'
-            nodes = nodes.append(nodetype, axis=1)
-        if node > 0.5:
-            nodetype = 'upregulated'
-            nodes = nodes.append(nodetype, axis=1)
-        else:
-            nodetype = 'neutral' 
-            nodes = nodes.append(nodetype, axis=1)
-    for nodename in nodes:
-        nodeval = n[number_nodes, :]
-        nnodes.append(nodeval)
-    nnodes = np.asarray(nnodes)
-    nnodes.shape = (number_nodes, n_in)
-    nodes = nodes.append(nnodes, axis=1)
-    print(nodes)
-nodes()
-    
-def nodetype (nodes):
-    for node in nodes[:, 2]:
-        if node < 0.5:
-            nodetype = 'downregulated'
-        if node > 0.5:
-            nodetype = 'upregulated'
-        else:
-            nodetype = 'neutral'             
+for i in range(0,4):
+    for d in D:
+#downregulated
+        difference1 = N1[i] - d
+        dist1 = np.sum(np.abs(difference1), 1)        
+        top1 = np.argmin(dist1)
+        bot1 = np.argmax(dist1)
+        low1 = nd[bot1]
+        high1 = nd[top1]
+        downhigh.insert(0, high1) 
+        downlow.insert(0, low1)
+#upregulated
+        difference2 = N2[i] - d
+        dist2 = np.sum(np.abs(difference2), 1)
+        top2 = np.argmin(dist2)
+        bot2 = np.argmax(dist2)
+        low2 = nd[bot2]
+        high2 = nd[top2]
+        uphigh.insert(0, high2)
+        uplow.insert(0, low2)
+#neutral 
+        difference3 = N3[i] - d
+        dist3 = np.sum(np.abs(difference3), 1)
+        top3 = np.argmin(dist3)
+        bot3 = np.argmax(dist3)
+        low3 = nd[bot3]
+        high3 = nd[top3]
+        neuthigh.insert(0, high3)
+        neutlow.insert(0, low3)
+print(uphigh)
 
-def diff():
-    differences = []
-    for nodename in nnodes:
-        difference = 'diff' + str(number)
-        differences.append(difference)
-def difference (nodes):
-    for difference in differences:
-        diff = nodename - data
-    print(differences)
-difference(diff2)
 
-   
-    
-   
-node1 = w[0, :]
-node2 = w[1, :]
-node3 = w[2, :]
-
-difference1 = node1 - data
-dist1 = np.sum(np.abs(difference1), 1)
-
-difference2 = node2 - data
-dist2 = np.sum(np.abs(difference2), 1)
-
-difference3 = node3 - data
-dist3 = np.sum(np.abs(difference3), 1)
-
-#find the index in dist array that's lowest difference from representation node
-top1 = np.argmin(dist1)
-top2 = np.argmin(dist2)
-top3 = np.argmin(dist3)
-ans1 = namedata[top1]
-ans2 = namedata[top2]
-ans3 = namedata[top3]
-ans = []
-ans.append(ans1)
-ans.append(ans2)
-ans.append(ans3)
-###plot the data in 3d topology graph
-#import matplotlib.pyplot as plt
-#from mpl_toolkits.mplot3d import Axes3D
-#fig = plt.figure()
-#ax = fig.add_subplot(111, projection='3d')
-#Axes3D.plot_surface(X, Y, Z)
-print (filename)
-print (w)
-print(ans)
-#make the weights
-w2 = np.random.randn(number_nodes, n_in) * 0.1
-#do the training and show the weights on the nodes with cv2
-for i in range(n_iters):
-    randsamples = np.random.randint(0, data2.shape[0], 1)[0] #between zero and number of rows, give me one
-    rand_in = data2[randsamples, :] #use randsample as an index for that row and all columns associated
-    difference = w2 - rand_in
-    dist = np.sum(np.absolute(difference), 1)
-    best = np.argmin(dist)
-    w2_eligible = w2[best,:]
-    w2_eligible += (lr * (rand_in - w2_eligible))
-    w2[best,:] = w2_eligible
-    cv2.namedWindow('weights', cv2.WINDOW_NORMAL)
-    cv2.imshow('weights', bytescale(w2))
-    cv2.waitKey(100)
-#queary validation   
-node4 = w2[0, :]
-node5 = w2[1, :]
-node6 = w2[2, :]
-difference4 = node4 - data
-dist4 = np.sum(np.abs(difference4), 1)
-difference5 = node5 - data
-dist5 = np.sum(np.abs(difference5), 1)
-difference6 = node6 - data
-dist6 = np.sum(np.abs(difference6), 1)
-dist4 = dist4[dist4 != np.amax(dist4)]
-dist5 = dist5[dist5 != np.amax(dist5)]
-dist6 = dist6[dist6 != np.amax(dist6)]
-dist4 = dist4[dist4 != np.amax(dist4)]
-dist5 = dist5[dist5 != np.amax(dist5)]
-dist6 = dist6[dist6 != np.amax(dist6)]  
-top4 = np.argmin(dist4)
-top5 = np.argmin(dist5)
-top6 = np.argmin(dist6)
-ans4 = namedata[top4]
-ans5 = namedata[top5]
-ans6 = namedata[top6]
-ans2 = []
-ans2.append(ans4)
-ans2.append(ans5)
-ans2.append(ans6)
-###plot the data in 3d topology graph
-fig = plt.figure()
-ax= fig.add_subplot(111, projection='3d')
-ax.scatter(dist4, dist5, dist6)
-for x in range(360):
-    ax.view_init(elev=90, azim=x)  # can change the view like this...elev = viewing elevation; azim = viewing rotation
-    plt.tight_layout()
-    plt.show()
-    plt.close()
-#show the weights for the datafile
-print(filename2)
-print(w2)
-print(ans2)
 ###############################################################################
 
