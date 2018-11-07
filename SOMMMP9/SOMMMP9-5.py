@@ -1,33 +1,34 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Nov  1 21:14:16 2018
+Created on Thu Oct 18 18:21:56 2018
 
-@author: blue
+@author: mpcr
 """
-
 
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 from scipy.misc import bytescale
-#how many times to run it
-n_trials = 2
-#define hyperparameters
-lr = 0.025
-n_iters = 100
-number_nodes = 3
-#store the answers here
-downhigh = []
-downlow = []
-uphigh = []
-uplow = []
-neuthigh = []
-neutlow = []
-#get the data for all sheets independently and mkae weights
-def get_data():
+
+def hyper():
+    #how many times to run the whole thing
+    n_trials = 2
+    #define hyperparameters
+    lr = 0.025
+    n_iters = 100
+    number_nodes = 3
+    #store the answers here
+    downhigh = []
+    downlow = []
+    uphigh = []
+    uplow = []
+    neuthigh = []
+    neutlow = []
     D = []
     ws = []#weights per sheet
+#get the data for all sheets independently and mkae weights
+def get_data():
     file = ['DE0', 'DE1', 'DE2', 'DE3']
     for DE in file:
         filename = DE + '.csv'
@@ -59,9 +60,13 @@ def get_data():
 #            cv2.namedWindow('weights', cv2.WINDOW_NORMAL)
 #            cv2.imshow('weights', bytescale(w))
 #            cv2.waitKey(100)
-#save weights
         ws.append(w)
-#seperate the data per file
+#seperate some stuff for later
+def spec():
+    #seperate the data per file
+    N1 = []
+    N2 = []
+    N3 = []
     d0 = D[0]
     d1 = D[1]
     d2 = D[2]
@@ -71,10 +76,7 @@ def get_data():
     w1 = ws[1]
     w2 = ws[2]
     w3 = ws[3]
-    #query validation  
-    N1 = []
-    N2 = []
-    N3 = []
+    #specify type of weights  
     for w in ws:
         logcol = w[:, 1]
         downcol = np.argmin(logcol)
@@ -115,10 +117,10 @@ def queary(x):
         high3 = nd[top3]
         neuthigh.insert(0, high3)
         neutlow.insert(0, low3)
-def trials(n_trials):
+def trial(n_trials):
+    hyper()
     get_data()
-    queary(d2)
+    spec()
+    queary(d2)   
 trial(n_trials)  
 print(uphigh)          
-
-###############################################################################
