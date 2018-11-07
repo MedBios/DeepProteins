@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Oct 22 09:42:06 2018
+Created on Tue Nov  6 19:24:59 2018
 
-@author: mpcr
+@author: blue
 """
 
 
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 import os
 import cv2
@@ -175,109 +176,68 @@ data /= np.std(data, 0)
 #specify columns to be seperate inputs
 n_in = data.shape[1]
 #make the weights
-number_nodes = 3
+number_nodes = 1000
 w = np.random.randn(number_nodes, n_in) * 0.1
 #hyperparameters
 lr = 0.025
 n_iters = 1000
 #do the training and show the weights on the nodes with cv2
-def trial(n_trial):
-    for instance in range(n_trial): 
-        #specify the columns to later be represented by nodes
-        n_in = data.shape[1]
-        #make the weights
-        number_nodes = 900
-        w = np.random.randn(number_nodes, n_in) * 0.1
-        #hyperparameters
-        lr = 0.025
-        n_iters = 500
-        for i in range(n_iters):
-            randsamples = np.random.randint(0, data.shape[0], 1)[0] 
-            rand_in = data[randsamples, :] 
-            difference = w - rand_in
-            dist = np.sum(np.absolute(difference), 1)
-            best = np.argmin(dist)
-            w_eligible = w[best,:]
-            w_eligible += (lr * (rand_in - w_eligible))
-            w[best,:] = w_eligible
-            #cv2.namedWindow('weights', cv2.WINDOW_NORMAL)
-            #cv2.imshow('weights', bytescale(w))
-            #cv2.waitKey(100)
-        #cv2.destroyAllWindows()
+#specify the columns to later be represented by nodes
+n_in = data.shape[1]
+#make the weights
+number_nodes = 900
+w = np.random.randn(number_nodes, n_in) * 0.1
+#hyperparameters
+lr = 0.025
+n_iters = 500
+for i in range(n_iters):
+    randsamples = np.random.randint(0, data.shape[0], 1)[0] 
+    rand_in = data[randsamples, :] 
+    difference = w - rand_in
+    dist = np.sum(np.absolute(difference), 1)
+    best = np.argmin(dist)
+    w_eligible = w[best,:]
+    w_eligible += (lr * (rand_in - w_eligible))
+    w[best,:] = w_eligible
 #query validation   
-        #determine which node is which regualtion time
-        logcol = w[:, 1]
-        downcol = np.argmin(logcol)
-        upcol = np.argmax(logcol)
-        #define the nodes for the model
-        node1 = w[downcol, :]
-        node2 = w[upcol, :]
-        node3 = np.delete(w, [downcol, upcol], axis=0)               
-        #for node 1, find the closest data . and put it in downregulated set
-        difference1 = node1 - data
-        dist1 = np.sum(np.abs(difference1), 1)
-        top1 = np.argmin(dist1)
-        ans1 = namedata[top1, 0]
-        #print(ans1)
-        down.insert(0, ans1) 
-        #for node 2, find the closest data . and put it in upregulated set
-        difference2 = node2 - data
-        dist2 = np.sum(np.abs(difference2), 1)
-        top2 = np.argmin(dist2)
-        ans2 = namedata[top2, 0]
-        up.insert(0, ans2)
-        #for node 3, find the closest data . and put it in neutral regulated set
-        difference3 = node3 - data
-        dist3 = np.sum(np.abs(difference3), 1)
-        top3 = np.argmin(dist3)
-        ans3 = namedata[top3, 0]
-        neut.insert(0, ans3)
-n_trial = 9000
-trial(n_trial)
-nod = str(number_nodes)
-files = 'all.csv'
-#save the answeres as a .csv file
-csvname = 'genes' + str(n_trial) + nod
-csvfile = csvname + files
-with open(csvfile, mode='w', newline='') as csvname:
-    gene_writer = csv.writer(csvname, delimiter=',')
-    gene_writer.writerow(down)
-    gene_writer.writerow(up)
-    gene_writer.writerow(neut)
+#determine weights of nodes
+nodes = []
+for iters in range(0, number_nodes):
+    node = w[iters, :]
+    nodes.insert(0, node)
+nodes = np.asarray(nodes)
+#square each column in a row and sum the rows
+sums = np.square(nodes, nodes)
+sums = [sum(sums[i]) for i in range(number_nodes)]
+#take the sqroot of each sumn
+sums = np.asarray(sums)
+sums = np.sqrt(sums)
+#plot the sums (energies) of each node
+# Create heatmap
+x = w
+y = sums
+heatmap, xedges, yedges = np.histogram2d(x, y, bins=(4,4))
+extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
+# Plot heatmap
+plt.clf()
+plt.title('heatmap')
+plt.ylabel('energy')
+plt.xlabel('node')
+plt.imshow(heatmap, extent=extent)
+plt.show()
+
+
+
+
+
+#nod = str(number_nodes)
+#files = 'all.csv'
+##save the answeres as a .csv file
+#csvname = 'genes' + nod
+#csvfile = csvname + files
+#with open(csvfile, mode='w', newline='') as csvname:
+#    gene_writer = csv.writer(csvname, delimiter=',')
+#    gene_writer.writerow(down)
+#    gene_writer.writerow(up)
+#    gene_writer.writerow(neut)
 ###############################################################################
-#open the saved file and seperate the nodes into arrays
-genes = np.genfromtxt(csvfile, delimiter=',', dtype=str)
-print(genes.shape)
-print(genes[0,0])
-#seperate the genes by node into arrays
-downgenes = genes[0, :]
-print(downgenes.shape)
-upgenes = genes[1, :]
-neutgenes = genes[2, :]
-print(neutgenes.shape)
-#count the # of times a gene appeared for each node
-downv = collections.Counter(downgenes)
-downv = np.asarray(downv.most_common())
-print(downv.shape)    
-upv = collections.Counter(upgenes)
-upv = np.asarray(upv.most_common())
-print(upv.shape) 
-neutv = collections.Counter(neutgenes)
-neutv = np.asarray(neutv.most_common())
-print(neutv.shape) 
-
-
-#check to see if there is genes that were both upregulated and downregualted
-both = []
-for item in downv[:, 0]:
-    if item in upv[:, 0]:
-        both.insert(0, item)
-print(both)
-#same the answers as a new .csv
-csvname1 = 'geneanalysis' + nod
-csvfile1 = csvname1 + files
-with open(csvfile1, mode='w', newline='') as csvname1:
-    gene_writer = csv.writer(csvname1, delimiter=',')
-    gene_writer.writerow(downv)
-    gene_writer.writerow(upv)
-    gene_writer.writerow(neutv)
