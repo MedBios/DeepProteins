@@ -212,10 +212,39 @@ sums = [sum(sums[i]) for i in range(number_nodes)]
 #take the sqroot of each sumn
 sums = np.asarray(sums)
 sums = np.sqrt(sums)
-#plot the sums (energies) of each node
-# Create heatmap
-x = w
+
+#distance of each node from each datapoint and assign lowest distance to each node
+distnodes = []
+for its in range(number_nodes):    
+    dif = nodes[its] - data
+    distn = np.sum(np.absolute(dif), 1)
+    bestdist = np.argmin(distn)
+    dist_eli = distn[bestdist]
+    distnodes.append(dist_eli)
+
+
+#############????????????????????????????###################
+#distance of each node from eachother
+localnodes = []
+for a in range(number_nodes):
+    subtracter = sums[a] != sums[a]
+    subsums = sums[subtracter, :]
+    localize = sums[a] - subsums
+    localizen = np.abs(localize)
+    local = np.argmin(localizen)
+    local_eli = localizen[local]
+    localnodes.append(local_eli)
+
+
+
+
+###plots
+x = distnodes
 y = sums
+##scatter
+plt.scatter(x, y)
+##heatmap
+# Create heatmap
 heatmap, xedges, yedges = np.histogram2d(x, y, bins=(4,4))
 extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
 # Plot heatmap
