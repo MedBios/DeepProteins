@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Nov  6 19:24:59 2018
+Created on Mon Oct 22 09:42:06 2018
 
-@author: blue
+@author: mpcr
 """
-
 
 import numpy as np
 import math
@@ -18,8 +17,7 @@ import time
 import csv
 import collections, numpy
 
-
-
+nb = range(0,100)
 down = []
 up = []
 neut = []
@@ -121,7 +119,7 @@ namesarray2.shape = (10848, 1)
 data2 = np.concatenate((namesarray2, data2), axis=1)
 #create an array that has the condition
 condition2 = np.full((10848, 1), 2)
-#add the condition array to the data
+#add the condition arr ay to the data
 data2 = np.concatenate((data2, condition2), axis=1) 
 ###############################################################################
 file3 = 'DE3'
@@ -169,10 +167,12 @@ namedata = np.vstack((namedata, namedata3))
 data = np.vstack((data, data1))
 data = np.vstack((data, data2))
 data = np.vstack((data, data3))
+plt.imshow(sumsbox)
 #normalize the data
 data = np.array(data, dtype=np.float64)
 data -= np.mean(data, 0)
 data /= np.std(data, 0)
+#training######################################################################
 #specify columns to be seperate inputs
 n_in = data.shape[1]
 #make the weights
@@ -190,30 +190,35 @@ w = np.random.randn(number_nodes, n_in) * 0.1
 #hyperparameters
 lr = 0.025
 n_iters = 500
+###do the training and update the best nodes and the neighborhoods
 for i in range(n_iters):
     randsamples = np.random.randint(0, data.shape[0], 1)[0] 
     rand_in = data[randsamples, :] 
     difference = w - rand_in
     dist = np.sum(np.absolute(difference), 1)
     best = np.argmin(dist)
-    w_eligible = w[best,:]
+    if best - nb < 0:
+        update = list(range(0, best+nb))
+    elif best + nb > number_nodes:
+        update = list(range(best-nb, number_nodes))
+    else:
+        update = list(range(best-nb, best+nb))
+    eligible = np.ix_(update)
+    w_eligible = w[eligible]
     w_eligible += (lr * (rand_in - w_eligible))
-    w[best,:] = w_eligible
-#query validation   
-#determine weights of nodes
+    w[eligible] = w_eligible
+#query validation############################################################## 
+#determine weights of nodes --> energy of nodes
 nodes = []
 for iters in range(0, number_nodes):
     node = w[iters, :]
     nodes.insert(0, node)
 nodes = np.asarray(nodes)
 #square each column in a row and sum the rows
-sums = np.square(nodes, nodes)
-sums = [sum(sums[i]) for i in range(number_nodes)]
+sums = np.sum(nodes**2, 1)
 #take the sqroot of each sumn
-sums = np.asarray(sums)
 sums = np.sqrt(sums)
-
-#distance of each node from each datapoint and assign lowest distance to each node
+#distance of each node from each datapoint assign lowest distance to each node
 distnodes = []
 for its in range(number_nodes):    
     dif = nodes[its] - data
@@ -221,39 +226,25 @@ for its in range(number_nodes):
     bestdist = np.argmin(distn)
     dist_eli = distn[bestdist]
     distnodes.append(dist_eli)
-
-
-#############????????????????????????????###################
-#distance of each node from eachother
+#distance of each node from each other node assign lowest to each node
 localnodes = []
 for a in range(number_nodes):
-    subtracter = sums[a] != sums[a]
-    subsums = sums[subtracter, :]
-    localize = sums[a] - subsums
-    localizen = np.abs(localize)
-    local = np.argmin(localizen)
-    local_eli = localizen[local]
-    localnodes.append(local_eli)
-
-
-
-
+    localize = np.abs(sums[a] - sums)
+    disc = np.argmin(localize)
+    removedloc = localize[:] != localize[disc]
+    localize = localize[removedloc]
+    local = np.amin(localize)
+    localnodes.append(local)  
+#plot energies
+sumsbox = np.reshape(sums, (30,30))
+plt.imshow(sumsbox)
 ###plots
-x = distnodes
-y = sums
+x = sums
+y = distnodes
 ##scatter
 plt.scatter(x, y)
-##heatmap
-# Create heatmap
-heatmap, xedges, yedges = np.histogram2d(x, y, bins=(4,4))
-extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
-# Plot heatmap
-plt.clf()
-plt.title('heatmap')
-plt.ylabel('energy')
-plt.xlabel('node')
-plt.imshow(heatmap, extent=extent)
 plt.show()
+
 
 
 
@@ -270,3 +261,5 @@ plt.show()
 #    gene_writer.writerow(up)
 #    gene_writer.writerow(neut)
 ###############################################################################
+
+
