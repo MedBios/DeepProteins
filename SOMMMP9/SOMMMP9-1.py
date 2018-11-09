@@ -10,11 +10,11 @@ Created on Wed Sep 26 12:44:33 2018
 
 import numpy as np
 import csv
-import collections, numpy
+import operator
 import matplotlib.pyplot as plt
 
 #how many times to run the whole thing
-n_trials = 10
+n_trials = 1
 #define hyperparameters
 lr = 0.001
 n_iters = 1000
@@ -27,7 +27,8 @@ uplow = []
 neuthigh = []
 neutlow = []
 D = []
-#get the data for all sheets independently and mkae weight
+ND = []
+#get the data for all sheets independently and mkae weight#####################
 file = ['DE0', 'DE1', 'DE2', 'DE3']
 for DE in file:
     filename = DE + '.csv'
@@ -38,17 +39,23 @@ for DE in file:
     nd = np.genfromtxt(filename, delimiter=',', skip_header=0,  dtype=str, usecols=0)
     nd = nd[removeNA]
     nd = nd[:] 
+    ND.append(nd)
     #nomalize the data    
     d = np.array(d, dtype=np.float64)
     d -= np.mean(d, 0)
     d /= np.std(d, 0)
     D.append(d)
+#view the data for exceptions##################################################
 d0 = D[0]
 d1 = D[1]
 d2 = D[2]
-d2 = np.delete(d2, 7861, axis=0)
-d3 = D[3]                  
-def trial(x):
+d3 = D[3]
+nd0 = ND[0]
+nd1 = ND[1]
+nd2 = ND[2]
+nd3 = ND[3]  
+#do the training###############################################################             
+def trial(x, y):
     for instance in range(n_trials):
         ws = [] #weights per sheet
         for d in D:
@@ -86,69 +93,187 @@ def trial(x):
             N1.append(node1)
             N2.append(node2)
             N3.append(node3)  
-        #get the best fit and save it in down/up/neut
-        for i in range(0, 4):
-            #downregulated
-            difference1 = N1[i] - x
-            dist1 = np.sum(np.abs(difference1), 1)        
-            top1 = np.argmin(dist1)
-            bot1 = np.argmax(dist1)
-            low1 = nd[bot1]
-            high1 = nd[top1]
-            downhigh.insert(0, high1) 
-            downlow.insert(0, low1)
-            #upregulated
-            difference2 = N2[i] - x
-            dist2 = np.sum(np.abs(difference2), 1)
-            top2 = np.argmin(dist2)
-            bot2 = np.argmax(dist2)
-            low2 = nd[bot2]
-            high2 = nd[top2]
-            uphigh.insert(0, high2)
-            uplow.insert(0, low2)
-            #neutral 
-            difference3 = N3[i] - x
-            dist3 = np.sum(np.abs(difference3), 1)
-            top3 = np.argmin(dist3)
-            bot3 = np.argmax(dist3)
-            low3 = nd[bot3]
-            high3 = nd[top3]
-            neuthigh.insert(0, high3)
-            neutlow.insert(0, low3)
+        #get the best fit and save it in down/up/neut for each node############
+        for i in range(0, 4):# range i == each datasheet weight of N#
+        #downregulated
+            d0 = D[0]
+            d1 = D[1]
+            d2 = D[2]
+            d3 = D[3]
+            nd0 = ND[0]
+            nd1 = ND[1]
+            nd2 = ND[2]
+            nd3 = ND[3]  
+            outliershigh = []
+            for r in range(20):#range 20 = take the top 20 outliers (argmax/min)
+                difference1 = N1[i] - x
+                dist1 = np.sum(np.abs(difference1), 1)
+                top1 = np.argmin(dist1)
+                outliershigh.insert(-1, top1)
+                x = np.delete(x, top1, axis=0)
+            olhigh = []
+            for z in range(20):
+                ind = outliershigh[z]
+                thing1 = y[ind]
+                y = np.delete(y, ind, axis=0)
+                olhigh.insert(-1, thing1)
+            downhigh.insert(0, olhigh)
+            d0 = D[0]
+            d1 = D[1]
+            d2 = D[2]
+            d3 = D[3]
+            nd0 = ND[0]
+            nd1 = ND[1]
+            nd2 = ND[2]
+            nd3 = ND[3]  
+            outlierslow = []
+            for r in range(20):
+                difference1 = N1[i] - x
+                dist1 = np.sum(np.abs(difference1), 1)
+                bot1 = np.argmax(dist1)
+                outlierslow.insert(-1, bot1)
+                x = np.delete(x, bot1, axis=0)
+            ollow = []
+            for z in range(20):
+                ind = outlierslow[z]
+                thing2 = y[ind]
+                y = np.delete(y, ind, axis=0)
+                ollow.insert(-1, thing2)
+            downlow.insert(0, ollow)   
+        #upregulated#####################################################
+            d0 = D[0]
+            d1 = D[1]
+            d2 = D[2]
+            d3 = D[3]
+            nd0 = ND[0]
+            nd1 = ND[1]
+            nd2 = ND[2]
+            nd3 = ND[3]  
+            outliershigh = []
+            for r in range(20):
+                difference2 = N2[i] - x
+                dist2 = np.sum(np.abs(difference2), 1)
+                top1 = np.argmin(dist2)
+                outliershigh.insert(-1, top1)
+                x = np.delete(x, top1, axis=0)
+            olhigh = []
+            for z in range(20):
+                ind = outliershigh[z]
+                thing1 = y[ind]
+                y = np.delete(y, ind, axis=0)
+                olhigh.insert(-1, thing1)
+            uphigh.insert(0, olhigh)
+            d0 = D[0]
+            d1 = D[1]
+            d2 = D[2]
+            d3 = D[3]
+            nd0 = ND[0]
+            nd1 = ND[1]
+            nd2 = ND[2]
+            nd3 = ND[3]  
+            outlierslow = []
+            for r in range(20):
+                difference2 = N2[i] - x
+                dist2 = np.sum(np.abs(difference2), 1)
+                bot1 = np.argmax(dist2)
+                outlierslow.insert(-1, bot1)
+                x = np.delete(x, bot1, axis=0)
+            ollow = []
+            for zl in range(20):
+                ind = outlierslow[zl]
+                thing2 = y[ind]
+                y = np.delete(y, ind, axis=0)
+                ollow.insert(-1, thing2)
+            uplow.insert(0, ollow) 
+        #neutral########################################################
+            d0 = D[0]
+            d1 = D[1]
+            d2 = D[2]
+            d3 = D[3]
+            nd0 = ND[0]
+            nd1 = ND[1]
+            nd2 = ND[2]
+            nd3 = ND[3]  
+            outliershigh = []
+            for r in range(20):
+                difference3 = N3[i] - x
+                dist3 = np.sum(np.abs(difference3), 1)
+                top1 = np.argmin(dist3)
+                outliershigh.insert(-1, top1)
+                x = np.delete(x, top1, axis=0)
+            olhigh = []
+            for z in range(20):
+                ind = outliershigh[z]
+                thing1 = y[ind]
+                y = np.delete(y, ind, axis=0)
+                olhigh.insert(-1, thing1)
+            neuthigh.insert(0, olhigh)
+            d0 = D[0]
+            d1 = D[1]
+            d2 = D[2]
+            d3 = D[3]
+            nd0 = ND[0]
+            nd1 = ND[1]
+            nd2 = ND[2]
+            nd3 = ND[3]  
+            outlierslow = []
+            for r in range(20):
+                difference3 = N3[i] - x
+                dist3 = np.sum(np.abs(difference3), 1)
+                bot1 = np.argmax(dist3)
+                outlierslow.insert(-1, bot1)
+                x = np.delete(x, bot1, axis=0)
+            ollow = []
+            for zl in range(20):
+                ind = outlierslow[zl]
+                thing2 = y[ind]
+                y = np.delete(y, ind, axis=0)
+                ollow.insert(-1, thing2)
+            neutlow.insert(0, ollow) 
 #run it########################################################################
-trial(d2)
+trial(d2, nd2)
 #COUNTER#######################################################################
-##format the regualted gene names into an array
-#col1=upregulated; col2=downregulated
-downr = np.stack((downhigh, downlow), axis=1)
-upr = np.stack((uphigh, downlow), axis=1)
-neutr = np.stack((neuthigh, neutlow), axis=1)
-#each set of 4k rows is down, up and neut respectively
-bothr = np.concatenate((downr, upr), axis=0)
-regulated = np.concatenate((bothr, neutr), axis=0)
-print(regulated.shape)
-regulated = tuple(map(tuple, regulated))
+#sets
+downhigh = np.asarray(downhigh),
+downlow = np.asarray(downlow),
+uphigh = np.asarray(uphigh),
+uplow = np.asarray(uplow),
+neuthigh = np.asarray(neuthigh),
+neutlow = np.asarray(neutlow)
+sets = downhigh, downlow, uphigh, uplow, neuthigh, neutlow
 #find the top ten occuring names in each set for high, low
-top_reg = []
-for cond in range(3):
-    num = n_trials*4
-    batch = (cond*num) + num
-    insert = regulated[:batch]
-    insert = tuple(map(tuple, insert))
-    count = collections.Counter(insert)
-    count = np.asarray(count.most_common())
-    topten = count[:10]
-    top_reg.append(topten)
-print(top_reg)
-#save the top10 regulated from (down, up, and neut) of (high, low) as .csv#####
+#?????????the problem is if there is not the highest??????????????????????????????
+each = []
+for element in sets:
+    top_reg = []
+    for cond in range(4):#cond=row of downhigh = 
+        count = np.array(np.unique(element,return_counts=1)).transpose()
+        counted = np.asarray(count)
+        #count.argsort()
+        index, value = max(enumerate(count[1]), key=operator.itemgetter(1))
+        top_ten = counted[0, index] 
+        top_reg.append(top_ten)
+    each.append(top_reg)
+    print(top_reg)
 
+
+
+#save the top10 regulated from (down, up, and neut) of (high, low) as .csv#####
 #csvname = 'd2' + str(n_trials) + '_top_reg'
 #csvfile = csvname + '.csv'
 #with open(csvfile, mode='w', newline='') as csvname:
 #    gene_writer = csv.writer(csvname, delimiter=',')
 #    gene_writer.writerow(top_reg)
 
-
+#for cond in range(3):
+#    num = n_trials*4
+#    batch = (cond*num) + num
+#    insert = regulated[:batch] 
+    #count = collections.Counter(insert)
+    #count = np.asarray(count.most_common())
+#    topten = count[:10]
+#    top_reg.append(topten)
+#print(top_reg)
         
 
     
