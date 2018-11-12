@@ -14,12 +14,8 @@ import csv
 import collections, numpy
 import matplotlib.pyplot as plt
 
-x = d2
-y = nd2
-ex = 'd2'
-
 #how many times to run the whole thing
-n_trials = 1000
+n_trials = 100
 #define hyperparameters
 lr = 0.001
 n_iters = 1000
@@ -53,7 +49,17 @@ nd1 = ND[1]
 nd2 = ND[2]
 nd3 = ND[3]  
 #do the training###############################################################             
-    #store the answers here
+
+
+
+x = d2
+y = nd2
+ex = 'd2'
+
+
+
+
+#store the answers here
 downhigh = []
 downlow = []
 uphigh = []
@@ -107,13 +113,7 @@ for instance in range(n_trials):
         top1 = np.argmin(dist1)
         top = y[top1]
         sheet.append(top)
-        difference1 = N1[i] - x
-        dist1 = np.sum(np.abs(difference1), 1)
-        bot1 = np.argmax(dist1)
-        bot = y[bot1]
-        sheet1.append(bot)
-    downhigh.insert(-1, sheet)        
-    downlow.insert(-1, sheet1)         
+    downhigh.insert(-1, sheet)                
         #upregulated##################################################### 
     sheet = []
     sheet1 = []
@@ -123,13 +123,7 @@ for instance in range(n_trials):
         top1 = np.argmin(dist1)
         top = y[top1]
         sheet.append(top)
-        difference1 = N2[i] - x
-        dist1 = np.sum(np.abs(difference1), 1)
-        bot1 = np.argmax(dist1)
-        bot = y[bot1]
-        sheet1.append(bot)
     uphigh.insert(-1, sheet)        
-    uplow.insert(-1, sheet1)
         #neutral########################################################
     sheet = []
     sheet1 = []
@@ -139,21 +133,61 @@ for instance in range(n_trials):
         top1 = np.argmin(dist1)
         top = y[top1]
         sheet.append(top)
-        difference1 = N3[i] - x
-        dist1 = np.sum(np.abs(difference1), 1)
-        bot1 = np.argmax(dist1)
-        bot = y[bot1]
-        sheet1.append(bot)
     neuthigh.insert(-1, sheet)       
-    neutlow.insert(-1, sheet1)
-        #print('done_with_iter')
-print('done_with_trials')
+#downregulated 
+for i in range(0, 4):# range i == each datasheet weight of N#
+    outliers = []
+    for r in range(n_trials):#range 20 = take the top 20 outliers (argmax/min)
+        difference1 = N1[i] - x
+        dist1 = np.sum(np.abs(difference1), 1)
+        top1 = np.argmin(dist1)
+        outliers.insert(-1, top1)
+        x = np.delete(x, top1, axis=0)
+    ol = []
+    for z in range(n_trials):
+        ind = outliers[z]
+        thing1 = y[ind]
+        y = np.delete(y, ind, axis=0)
+        ol.insert(-1, thing1)
+    downlow.insert(-1, ol)
+#upregulated 
+for i in range(0, 4):# range i == each datasheet weight of N#
+    outliers = []
+    for r in range(n_trials):#range 20 = take the top 20 outliers (argmax/min)
+        difference1 = N1[i] - x
+        dist1 = np.sum(np.abs(difference1), 1)
+        top1 = np.argmin(dist1)
+        outliers.insert(-1, top1)
+        x = np.delete(x, top1, axis=0)
+    ol = []
+    for z in range(n_trials):
+        ind = outliers[z]
+        thing1 = y[ind]
+        y = np.delete(y, ind, axis=0)
+        ol.insert(-1, thing1)
+    uplow.insert(-1, ol)
+#neutregulated 
+for i in range(0, 4):# range i == each datasheet weight of N#
+    outliers = []
+    for r in range(n_trials):#range 20 = take the top 20 outliers (argmax/min)
+        difference1 = N1[i] - x
+        dist1 = np.sum(np.abs(difference1), 1)
+        top1 = np.argmin(dist1)
+        outliers.insert(-1, top1)
+        x = np.delete(x, top1, axis=0)
+    ol = []
+    for z in range(n_trials):
+        ind = outliers[z]
+        thing1 = y[ind]
+        y = np.delete(y, ind, axis=0)
+        ol.insert(-1, thing1)
+    neutlow.insert(-1, ol)
 downhigh = np.transpose(np.asarray(downhigh))
-downlow =  np.transpose(np.asarray(downlow))
+downlow =  np.asarray(downlow)
 uphigh =  np.transpose(np.asarray(uphigh))
-uplow =  np.transpose(np.asarray(uplow))
+uplow =  np.asarray(uplow)
 neuthigh =  np.transpose(np.asarray(neuthigh))
-neutlow =  np.transpose(np.asarray(neutlow))
+neutlow =  np.asarray(neutlow)
 ###save as file################################################################
 csvfile = ex + 'genes' + str(n_trials) + 'SOMMMP9-1.csv'
 csvname = str(ex) + 'genes' + str(n_trials) + 'SOMMMP9-1'
@@ -183,8 +217,7 @@ with open(csvfile, mode='w', newline='') as csvname:
     gene_writer.writerow(neutlow[1])
     gene_writer.writerow(neutlow[2])
     gene_writer.writerow(neutlow[3])
-
-    ##open saved file##############################################################
+##open saved file##############################################################
 genes = np.genfromtxt(csvfile, delimiter=',', dtype=str)
 downhighgenes = genes[:4, :]
 downlowgenes = genes[4:8, :]
@@ -201,9 +234,7 @@ for row in range(4):
     top_reg_dh.append(topten)    
 top_reg_dl = []
 for row in range(4):
-    count = collections.Counter(downlowgenes[row])
-    count = np.asarray(count.most_common())
-    topten = count[:10]
+    topten = downlowgenes[row, :10]
     top_reg_dl.append(topten)                
 top_reg_uh = []
 for row in range(4):
@@ -213,9 +244,7 @@ for row in range(4):
     top_reg_uh.append(topten)           
 top_reg_ul = []
 for row in range(4):
-    count = collections.Counter(uplowgenes[row])
-    count = np.asarray(count.most_common())
-    topten = count[:10]
+    topten = uplowgenes[row, :10]
     top_reg_ul.append(topten)            
 top_reg_nh = []
 for row in range(4):
@@ -225,9 +254,7 @@ for row in range(4):
     top_reg_nh.append(topten)
 top_reg_nl = []
 for row in range(4):
-    count = collections.Counter(neutlowgenes[row])
-    count = np.asarray(count.most_common())
-    topten = count[:10]
+    topten = neutlowgenes[row, :10]
     top_reg_nl.append(topten)
     ###save results as a file
     #save the top10 regulated from (down, up, and neut) of (high, low) as .csv#####
@@ -241,9 +268,9 @@ with open(csvfile, mode='w', newline='') as csvname:
     gene_writer.writerow(top_reg_ul)
     gene_writer.writerow(top_reg_nh)
     gene_writer.writerow(top_reg_nl)
-print(top_reg_uh)
-#run it########################################################################
-trial
+print(top_reg_ul)
+
+
 
 
 
