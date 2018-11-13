@@ -50,9 +50,9 @@ nd3 = ND[3]
 
 
 
-x = d3
-y = nd3
-ex = 'd3'
+x = d1
+y = nd1
+ex = 'd1'
 
 
 
@@ -135,8 +135,8 @@ for instance in range(n_trials):
 #downregulated
     
     
-x = d3
-y = nd3
+x = d1
+y = nd1
     
     
     
@@ -167,9 +167,11 @@ for i in range(0, 4):# range i == each datasheet weight of N#
 #upregulated
     
     
+    
+    
  
-x = d3
-y = nd3
+x = d1
+y = nd1
 
       
 d0 = D[0]
@@ -183,7 +185,7 @@ nd3 = ND[3]
 for i in range(0, 4):# range i == each datasheet weight of N#
     outliers = []
     for r in range(n_trials):# take the top outliers (argmax/min)
-        difference1 = N1[i] - x
+        difference1 = N2[i] - x
         dist1 = np.sum(np.abs(difference1), 1)
         top1 = np.argmin(dist1)
         outliers.insert(-1, top1)
@@ -198,8 +200,8 @@ for i in range(0, 4):# range i == each datasheet weight of N#
 #neutregulated 
  
     
-x = d3
-y = nd3    
+x = d1
+y = nd1    
     
     
     
@@ -214,7 +216,7 @@ nd3 = ND[3]
 for i in range(0, 4):# range i == each datasheet weight of N#
     outliers = []
     for r in range(n_trials):# take the top outliers (argmax/min)
-        difference1 = N1[i] - x
+        difference1 = N3[i] - x
         dist1 = np.sum(np.abs(difference1), 1)
         top1 = np.argmin(dist1)
         outliers.insert(-1, top1)
@@ -313,3 +315,4 @@ with open(csvfile, mode='w', newline='') as csvname:
     gene_writer.writerow(top_reg_nh)
     gene_writer.writerow(top_reg_nl)
 print(top_reg_ul)
+print(top_reg_dl)
