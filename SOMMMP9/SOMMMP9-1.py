@@ -167,8 +167,6 @@ for i in range(0, 4):# range i == each datasheet weight of N#
 #upregulated
     
     
-    
-    
  
 x = d1
 y = nd1
@@ -315,4 +313,3 @@ with open(csvfile, mode='w', newline='') as csvname:
     gene_writer.writerow(top_reg_nh)
     gene_writer.writerow(top_reg_nl)
 print(top_reg_ul)
-print(top_reg_dl)
