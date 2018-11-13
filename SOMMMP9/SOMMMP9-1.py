@@ -12,6 +12,7 @@ import csv
 import collections, numpy
 import matplotlib.pyplot as plt
 
+
 #how many times to run the whole thing
 n_trials = 1000
 #define hyperparameters
@@ -24,11 +25,11 @@ ND = []
 file = ['DE0', 'DE1', 'DE2', 'DE3']
 for DE in file:
     filename = DE + '.csv'
-    d = np.genfromtxt(filename, delimiter=',', missing_values='NA', skip_header=0, filling_values=1, usecols=range(1,7))
+    d = np.genfromtxt(filename, delimiter=',', missing_values='NA', skip_header=2, filling_values=1, usecols=range(1,7))
     removeNA = d[:, -1] != 1
     d = d[removeNA, :]
     #get the data with the gene names in first column as a string
-    nd = np.genfromtxt(filename, delimiter=',', skip_header=0,  dtype=str, usecols=0)
+    nd = np.genfromtxt(filename, delimiter=',', skip_header=2,  dtype=str, usecols=0)
     nd = nd[removeNA]
     nd = nd[:] 
     ND.append(nd)
@@ -50,9 +51,9 @@ nd3 = ND[3]
 
 
 
-x = d1
-y = nd1
-ex = 'd1'
+x = d3
+y = nd3
+ex = 'd3'
 
 
 
@@ -101,8 +102,8 @@ for instance in range(n_trials):
         N1.append(node1)
         N2.append(node2)
         N3.append(node3)  
-##########get the best fit and save it in down/up/neut for each node############
-        #downregulated#####################################################     
+##########get the best fit and save it in down/up/neut for each node############   
+    #downregulated#####################################################     
     sheet = []
     sheet1 = []
     for i in range(0, 4):# range i == each datasheet weight of N#
@@ -132,15 +133,7 @@ for instance in range(n_trials):
         top = y[top1]
         sheet.append(top)
     neuthigh.insert(-1, sheet)       
-#downregulated
-    
-    
-x = d1
-y = nd1
-    
-    
-    
-    
+#downregulated    
 d0 = D[0]
 d1 = D[1]
 d2 = D[2]
@@ -150,6 +143,8 @@ nd1 = ND[1]
 nd2 = ND[2]
 nd3 = ND[3]  
 for i in range(0, 4):# range i == each datasheet weight of N#
+    x = d3
+    y = nd3
     outliers = []
     for r in range(n_trials):# take the top outliers (argmax/min)
         difference1 = N1[i] - x
@@ -164,14 +159,7 @@ for i in range(0, 4):# range i == each datasheet weight of N#
         y = np.delete(y, ind, axis=0)
         ol.insert(-1, thing1)
     downlow.insert(-1, ol)
-#upregulated
-    
-    
- 
-x = d1
-y = nd1
-
-      
+#upregulated      
 d0 = D[0]
 d1 = D[1]
 d2 = D[2]
@@ -179,8 +167,10 @@ d3 = D[3]
 nd0 = ND[0]
 nd1 = ND[1]
 nd2 = ND[2]
-nd3 = ND[3]    
+nd3 = ND[3]
 for i in range(0, 4):# range i == each datasheet weight of N#
+    x = d3
+    y = nd3
     outliers = []
     for r in range(n_trials):# take the top outliers (argmax/min)
         difference1 = N2[i] - x
@@ -196,13 +186,6 @@ for i in range(0, 4):# range i == each datasheet weight of N#
         ol.insert(-1, thing1)
     uplow.insert(-1, ol)
 #neutregulated 
- 
-    
-x = d1
-y = nd1    
-    
-    
-    
 d0 = D[0]
 d1 = D[1]
 d2 = D[2]
@@ -212,6 +195,8 @@ nd1 = ND[1]
 nd2 = ND[2]
 nd3 = ND[3]
 for i in range(0, 4):# range i == each datasheet weight of N#
+    x = d3
+    y = nd3 
     outliers = []
     for r in range(n_trials):# take the top outliers (argmax/min)
         difference1 = N3[i] - x
@@ -300,8 +285,27 @@ top_reg_nl = []
 for row in range(4):
     topten = neutlowgenes[row, :10]
     top_reg_nl.append(topten)
-    ###save results as a file
-    #save the top10 regulated from (down, up, and neut) of (high, low) as .csv#####
+###check how many times the genes appear  per sheet
+reg_dh = np.asarray(top_reg_dh)
+reg_dl = np.asarray(top_reg_dl)
+reg_uh = np.asarray(top_reg_uh)
+reg_ul = np.asarray(top_reg_ul)
+reg_nh = np.asarray(top_reg_nh)
+reg_nl = np.asarray(top_reg_nl)
+
+dh = reg_dh[:, :, 0]
+uh = reg_uh[:, :, 0]
+nh = reg_nh[:, :, 0]
+
+
+a = np.hstack((dh, top_reg_dl, uh, top_reg_ul, nh, top_reg_nl))
+analysis = []
+for c in range(0,4):
+    count = collections.Counter(a[c, :])
+    count = np.asarray(count.most_common())
+    topten = count[:10]
+    analysis.append(topten)
+#save the top10 regulated from (down, up, and neut) of (high, low) as .csv#
 csvname =  ex + str(n_trials) + '_top_reg'
 csvfile = csvname + '.csv'
 with open(csvfile, mode='w', newline='') as csvname:
@@ -312,4 +316,7 @@ with open(csvfile, mode='w', newline='') as csvname:
     gene_writer.writerow(top_reg_ul)
     gene_writer.writerow(top_reg_nh)
     gene_writer.writerow(top_reg_nl)
+    gene_writer.writerow(analysis)
 print(top_reg_ul)
+
+
