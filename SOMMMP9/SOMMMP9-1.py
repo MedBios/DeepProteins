@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Nov  9 18:41:45 2018
-
-@author: blue
+Created on Wed Sep 26 12:44:33 2018
+@author: mpcr
 """
-
 ##self-organizing map##
 #DESeq2 data for MMP9 t-cell inhibititor conditions#
 
@@ -15,7 +13,7 @@ import collections, numpy
 import matplotlib.pyplot as plt
 
 #how many times to run the whole thing
-n_trials = 100
+n_trials = 1000
 #define hyperparameters
 lr = 0.001
 n_iters = 1000
@@ -52,9 +50,9 @@ nd3 = ND[3]
 
 
 
-x = d2
-y = nd2
-ex = 'd2'
+x = d3
+y = nd3
+ex = 'd3'
 
 
 
@@ -104,7 +102,7 @@ for instance in range(n_trials):
         N2.append(node2)
         N3.append(node3)  
 ##########get the best fit and save it in down/up/neut for each node############
-        #downregulated##################################################### 
+        #downregulated#####################################################     
     sheet = []
     sheet1 = []
     for i in range(0, 4):# range i == each datasheet weight of N#
@@ -134,10 +132,26 @@ for instance in range(n_trials):
         top = y[top1]
         sheet.append(top)
     neuthigh.insert(-1, sheet)       
-#downregulated 
+#downregulated
+    
+    
+x = d3
+y = nd3
+    
+    
+    
+    
+d0 = D[0]
+d1 = D[1]
+d2 = D[2]
+d3 = D[3]
+nd0 = ND[0]
+nd1 = ND[1]
+nd2 = ND[2]
+nd3 = ND[3]  
 for i in range(0, 4):# range i == each datasheet weight of N#
     outliers = []
-    for r in range(n_trials):#range 20 = take the top 20 outliers (argmax/min)
+    for r in range(n_trials):# take the top outliers (argmax/min)
         difference1 = N1[i] - x
         dist1 = np.sum(np.abs(difference1), 1)
         top1 = np.argmin(dist1)
@@ -150,10 +164,25 @@ for i in range(0, 4):# range i == each datasheet weight of N#
         y = np.delete(y, ind, axis=0)
         ol.insert(-1, thing1)
     downlow.insert(-1, ol)
-#upregulated 
+#upregulated
+    
+    
+ 
+x = d3
+y = nd3
+
+      
+d0 = D[0]
+d1 = D[1]
+d2 = D[2]
+d3 = D[3]
+nd0 = ND[0]
+nd1 = ND[1]
+nd2 = ND[2]
+nd3 = ND[3]    
 for i in range(0, 4):# range i == each datasheet weight of N#
     outliers = []
-    for r in range(n_trials):#range 20 = take the top 20 outliers (argmax/min)
+    for r in range(n_trials):# take the top outliers (argmax/min)
         difference1 = N1[i] - x
         dist1 = np.sum(np.abs(difference1), 1)
         top1 = np.argmin(dist1)
@@ -167,9 +196,24 @@ for i in range(0, 4):# range i == each datasheet weight of N#
         ol.insert(-1, thing1)
     uplow.insert(-1, ol)
 #neutregulated 
+ 
+    
+x = d3
+y = nd3    
+    
+    
+    
+d0 = D[0]
+d1 = D[1]
+d2 = D[2]
+d3 = D[3]
+nd0 = ND[0]
+nd1 = ND[1]
+nd2 = ND[2]
+nd3 = ND[3]
 for i in range(0, 4):# range i == each datasheet weight of N#
     outliers = []
-    for r in range(n_trials):#range 20 = take the top 20 outliers (argmax/min)
+    for r in range(n_trials):# take the top outliers (argmax/min)
         difference1 = N1[i] - x
         dist1 = np.sum(np.abs(difference1), 1)
         top1 = np.argmin(dist1)
@@ -269,10 +313,3 @@ with open(csvfile, mode='w', newline='') as csvname:
     gene_writer.writerow(top_reg_nh)
     gene_writer.writerow(top_reg_nl)
 print(top_reg_ul)
-
-
-
-
-
-
-
