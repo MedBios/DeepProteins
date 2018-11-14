@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Sep 26 12:44:33 2018
-@author: mpcr
-"""
 ##self-organizing map##
 #DESeq2 data for MMP9 t-cell inhibititor conditions#
 
@@ -149,7 +143,7 @@ for i in range(0, 4):# range i == each datasheet weight of N#
     for r in range(n_trials):# take the top outliers (argmax/min)
         difference1 = N1[i] - x
         dist1 = np.sum(np.abs(difference1), 1)
-        top1 = np.argmin(dist1)
+        top1 = np.argmax(dist1)
         outliers.insert(-1, top1)
         x = np.delete(x, top1, axis=0)
     ol = []
@@ -175,7 +169,7 @@ for i in range(0, 4):# range i == each datasheet weight of N#
     for r in range(n_trials):# take the top outliers (argmax/min)
         difference1 = N2[i] - x
         dist1 = np.sum(np.abs(difference1), 1)
-        top1 = np.argmin(dist1)
+        top1 = np.argmax(dist1)
         outliers.insert(-1, top1)
         x = np.delete(x, top1, axis=0)
     ol = []
@@ -196,12 +190,12 @@ nd2 = ND[2]
 nd3 = ND[3]
 for i in range(0, 4):# range i == each datasheet weight of N#
     x = d3
-    y = nd3 
+    y = nd3
     outliers = []
     for r in range(n_trials):# take the top outliers (argmax/min)
         difference1 = N3[i] - x
         dist1 = np.sum(np.abs(difference1), 1)
-        top1 = np.argmin(dist1)
+        top1 = np.argmax(dist1)
         outliers.insert(-1, top1)
         x = np.delete(x, top1, axis=0)
     ol = []
@@ -318,5 +312,3 @@ with open(csvfile, mode='w', newline='') as csvname:
     gene_writer.writerow(top_reg_nl)
     gene_writer.writerow(analysis)
 print(top_reg_ul)
-
-
